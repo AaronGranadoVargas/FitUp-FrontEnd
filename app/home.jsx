@@ -5,17 +5,14 @@ import * as SecureStore from 'expo-secure-store';
 export default function HomeScreen() {
     const router = useRouter();
 
-    // Función para cerrar sesión
     const handleLogout = async () => {
         try {
-            // 1. Borramos la llave de la caja fuerte (Web o Móvil)
             if (Platform.OS === 'web') {
                 localStorage.removeItem('userToken');
             } else {
                 await SecureStore.deleteItemAsync('userToken');
             }
 
-            // 2. Lo devolvemos a la pantalla de Login (index)
             router.replace('/');
         } catch (error) {
             console.error("Error al cerrar sesión", error);
