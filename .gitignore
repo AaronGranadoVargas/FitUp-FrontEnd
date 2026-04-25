@@ -41,3 +41,9 @@ app-example
 # generated native folders
 /ios
 /android
+.idea/.gitignore
+.idea/FitUp-FrontEnd.iml
+.idea/misc.xml
+.idea/modules.xml
+.idea/vcs.xml
+.idea/inspectionProfiles/Project_Default.xml
