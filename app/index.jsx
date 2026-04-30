@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Platform } from 'react-native';
+import {View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Platform, Image} from 'react-native';
 import { useRouter } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import { theme } from '../src/styles/theme';
-import { Ionicons } from '@expo/vector-icons';
+import { authStyles } from '../src/styles/authStyles';
 
 export default function WelcomeScreen() {
     const router = useRouter();
@@ -42,20 +42,19 @@ export default function WelcomeScreen() {
     return (
         <View style={styles.container}>
             <View style={styles.logoContainer}>
-                <View style={styles.iconBackground}>
-                    <Ionicons name="barbell" size={80} color="white" />
-                </View>
-                <Text style={styles.title}>FitUp</Text>
-                <Text style={styles.subtitle}>Supera tus límites cada día.</Text>
+                <Image
+                    source={require('../assets/images/fitup-logo.png')}
+                    style={authStyles.logo}
+                    resizeMode="contain"
+                />
             </View>
 
-            {/* SECCIÓN INFERIOR: Botones */}
             <View style={styles.bottomContainer}>
                 <TouchableOpacity
-                    style={styles.primaryButton}
+                    style={authStyles.button}
                     onPress={() => router.push('/login')}
                 >
-                    <Text style={styles.primaryButtonText}>Iniciar Sesión</Text>
+                    <Text style={authStyles.buttonText}>Iniciar Sesión</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                     style={styles.secondaryButton}
@@ -72,12 +71,13 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#F5F5F5',
+        backgroundColor: theme.colors.fondoBase,
     },
     container: {
         flex: 1,
-        backgroundColor: '#F5F5F5',
+        backgroundColor: theme.colors.fondoBase,
         justifyContent: 'space-between',
+        alignItems: 'center',
         paddingVertical: 50,
         paddingHorizontal: 20,
     },
@@ -85,55 +85,24 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-    },
-    iconBackground: {
-        backgroundColor: theme.colors.naranja,
-        padding: 20,
-        borderRadius: 60,
-        marginBottom: 20,
-        elevation: 8,
-        shadowColor: theme.colors.naranja,
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 10,
-    },
-    title: {
-        fontSize: 48,
-        fontWeight: '900',
-        color: '#333',
-        letterSpacing: 1,
-    },
-    subtitle: {
-        fontSize: 18,
-        color: '#666',
-        marginTop: 10,
-        textAlign: 'center',
+        width: '100%',
+        maxWidth: 400,
     },
     bottomContainer: {
         width: '100%',
+        maxWidth: 400,
         paddingBottom: 20,
-    },
-    primaryButton: {
-        backgroundColor: theme.colors.naranja,
-        paddingVertical: 18,
-        borderRadius: 15,
-        alignItems: 'center',
-        marginBottom: 15,
-        elevation: 3,
-    },
-    primaryButtonText: {
-        color: 'white',
-        fontSize: 18,
-        fontWeight: 'bold',
-        textTransform: 'uppercase',
     },
     secondaryButton: {
         backgroundColor: 'transparent',
-        paddingVertical: 18,
-        borderRadius: 15,
+        paddingVertical: 15,
+        borderRadius: theme.borderRadius.boton,
         alignItems: 'center',
         borderWidth: 2,
         borderColor: theme.colors.naranja,
+        marginTop: 10,
+        minHeight: 55,
+        justifyContent: 'center',
     },
     secondaryButtonText: {
         color: theme.colors.naranja,
