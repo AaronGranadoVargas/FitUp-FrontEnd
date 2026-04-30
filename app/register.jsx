@@ -1,8 +1,8 @@
-import { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, ActivityIndicator, Keyboard } from 'react-native';
-import { useRouter } from 'expo-router';
-import { registrarUsuario } from '../src/api/authService';
-import { authStyles as styles } from '../src/styles/authStyles';
+import {useState} from 'react';
+import {View, Text, Image, TextInput, TouchableOpacity, ScrollView, ActivityIndicator, Keyboard} from 'react-native';
+import {useRouter} from 'expo-router';
+import {registrarUsuario} from '../src/api/authService';
+import {authStyles as styles} from '../src/styles/authStyles';
 
 export default function RegisterScreen() {
     const router = useRouter();
@@ -55,26 +55,44 @@ export default function RegisterScreen() {
 
     return (
         <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
-            <Text style={styles.title}>Crear Cuenta</Text>
+            <View style={styles.formWrapper}>
 
-            <TextInput style={styles.input} placeholder="Tu nombre completo" value={nombre} onChangeText={setNombre} editable={!cargando} />
-            <TextInput style={styles.input} placeholder="Correo electrónico" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" editable={!cargando} />
-            <TextInput style={styles.input} placeholder="Contraseña (mínimo 6 caracteres)" value={password} onChangeText={setPassword} secureTextEntry editable={!cargando} />
+                <Image
+                    source={require('../assets/images/fitup-logo.png')}
+                    style={styles.logo}
+                    resizeMode="contain"
+                />
 
-            <View style={styles.row}>
-                <TextInput style={[styles.input, styles.halfInput]} placeholder="Peso (ej: 75.5)" value={peso} onChangeText={handlePesoChange} keyboardType="numeric" editable={!cargando} />
-                <TextInput style={[styles.input, styles.halfInput]} placeholder="Altura en cm (ej: 180)" value={altura} onChangeText={handleAlturaChange} keyboardType="numeric" editable={!cargando} />
+                <Text style={styles.title}>Crear Cuenta</Text>
+
+
+                <TextInput style={styles.input} placeholder="Tu nombre completo" value={nombre} onChangeText={setNombre}
+                           editable={!cargando}/>
+                <TextInput style={styles.input} placeholder="Correo electrónico" value={email} onChangeText={setEmail}
+                           keyboardType="email-address" autoCapitalize="none" editable={!cargando}/>
+                <TextInput style={styles.input} placeholder="Contraseña (mínimo 6 caracteres)" value={password}
+                           onChangeText={setPassword} secureTextEntry editable={!cargando}/>
+
+                <View style={styles.row}>
+                    <TextInput style={[styles.input, styles.halfInput]} placeholder="Peso (ej: 75.5)" value={peso}
+                               onChangeText={handlePesoChange} keyboardType="numeric" editable={!cargando}/>
+                    <TextInput style={[styles.input, styles.halfInput]} placeholder="Altura en cm (ej: 180)"
+                               value={altura} onChangeText={handleAlturaChange} keyboardType="numeric"
+                               editable={!cargando}/>
+                </View>
+
+                {mensajeError ? <Text style={styles.errorText}>{mensajeError}</Text> : null}
+
+                <TouchableOpacity style={[styles.button, cargando && styles.buttonDisabled]} onPress={handleRegister}
+                                  disabled={cargando}>
+                    {cargando ? <ActivityIndicator color="white"/> : <Text style={styles.buttonText}>Registrarse</Text>}
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.linkButton} onPress={() => router.push('/login')}>
+                    <Text style={styles.linkText}>¿Ya tienes cuenta? Inicia sesión aquí</Text>
+                </TouchableOpacity>
             </View>
 
-            {mensajeError ? <Text style={styles.errorText}>{mensajeError}</Text> : null}
-
-            <TouchableOpacity style={[styles.button, cargando && styles.buttonDisabled]} onPress={handleRegister} disabled={cargando}>
-                {cargando ? <ActivityIndicator color="white" /> : <Text style={styles.buttonText}>Registrarse</Text>}
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.linkButton} onPress={() => router.push('/login')}>
-                <Text style={styles.linkText}>¿Ya tienes cuenta? Inicia sesión aquí</Text>
-            </TouchableOpacity>
         </ScrollView>
     );
 }

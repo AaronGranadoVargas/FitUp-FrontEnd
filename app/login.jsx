@@ -1,8 +1,8 @@
-import { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Keyboard } from 'react-native';
-import { useRouter } from 'expo-router';
-import { loginUsuario } from '../src/api/authService';
-import { authStyles as styles } from '../src/styles/authStyles';
+import {useState} from 'react';
+import {View, Text, TextInput, TouchableOpacity, ActivityIndicator, Keyboard, Image} from 'react-native';
+import {useRouter} from 'expo-router';
+import {loginUsuario} from '../src/api/authService';
+import {authStyles as styles} from '../src/styles/authStyles';
 
 export default function LoginScreen() {
     const router = useRouter();
@@ -37,21 +37,31 @@ export default function LoginScreen() {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>FitUp 💪</Text>
-            <Text style={styles.subtitle}>Inicia sesión para continuar</Text>
+            <View style={styles.formWrapper}>
+                <Image
+                    source={require('../assets/images/fitup-logo.png')}
+                    style={styles.logo}
+                    resizeMode="contain"
+                />
+                <Text style={styles.title}>Iniciar sesión</Text>
 
-            <TextInput style={styles.input} placeholder="Correo electrónico" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" editable={!cargando} />
-            <TextInput style={styles.input} placeholder="Contraseña" value={password} onChangeText={setPassword} secureTextEntry editable={!cargando} />
+                <TextInput style={styles.input} placeholder="Correo electrónico" value={email} onChangeText={setEmail}
+                           keyboardType="email-address" autoCapitalize="none" editable={!cargando}/>
+                <TextInput style={styles.input} placeholder="Contraseña" value={password} onChangeText={setPassword}
+                           secureTextEntry editable={!cargando}/>
 
-            {mensajeError ? <Text style={styles.errorText}>{mensajeError}</Text> : null}
+                {mensajeError ? <Text style={styles.errorText}>{mensajeError}</Text> : null}
 
-            <TouchableOpacity style={[styles.button, cargando && styles.buttonDisabled]} onPress={handleLogin} disabled={cargando}>
-                {cargando ? <ActivityIndicator color="white" /> : <Text style={styles.buttonText}>Entrar</Text>}
-            </TouchableOpacity>
+                <TouchableOpacity style={[styles.button, cargando && styles.buttonDisabled]} onPress={handleLogin}
+                                  disabled={cargando}>
+                    {cargando ? <ActivityIndicator color="white"/> : <Text style={styles.buttonText}>Entrar</Text>}
+                </TouchableOpacity>
 
-            <TouchableOpacity style={styles.linkButton} onPress={() => router.push('/register')} disabled={cargando}>
-                <Text style={styles.linkText}>¿No tienes cuenta? Regístrate gratis</Text>
-            </TouchableOpacity>
+                <TouchableOpacity style={styles.linkButton} onPress={() => router.push('/register')}
+                                  disabled={cargando}>
+                    <Text style={styles.linkText}>¿No tienes cuenta? Regístrate gratis</Text>
+                </TouchableOpacity>
+            </View>
         </View>
     );
 }
