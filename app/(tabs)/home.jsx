@@ -1,12 +1,9 @@
-import { View, Text, TouchableOpacity, ScrollView, Platform } from 'react-native';
-import { useRouter } from 'expo-router';
+import { View, Text, ScrollView, Platform } from 'react-native';
 import { useEffect, useState } from 'react';
 import * as SecureStore from 'expo-secure-store';
 import { homeStyles as styles } from '../../src/styles/homeStyles';
 
 export default function HomeScreen() {
-    const router = useRouter();
-
     const [nombreUsuario, setNombreUsuario] = useState('');
 
     useEffect(() => {
@@ -24,21 +21,6 @@ export default function HomeScreen() {
         };
         cargarNombre();
     }, []);
-
-    const handleLogout = async () => {
-        try {
-            if (Platform.OS === 'web') {
-                localStorage.removeItem('userToken');
-                localStorage.removeItem('userName');
-            } else {
-                await SecureStore.deleteItemAsync('userToken');
-                await SecureStore.deleteItemAsync('userName');
-            }
-            router.replace('/');
-        } catch (error) {
-            console.error("Error al cerrar sesión", error);
-        }
-    };
 
     return (
         <ScrollView style={styles.container} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
@@ -70,10 +52,6 @@ export default function HomeScreen() {
             <View style={[styles.card, styles.secondaryCard]}>
                 <Text style={styles.cardTitleWhite}>Progreso Semanal</Text>
             </View>
-
-            <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-                <Text style={styles.logoutText}>Cerrar Sesión</Text>
-            </TouchableOpacity>
 
         </ScrollView>
     );

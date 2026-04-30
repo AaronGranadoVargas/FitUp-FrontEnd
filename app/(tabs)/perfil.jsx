@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, ActivityIndicator, Modal, TextInput, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, ActivityIndicator, Modal, TextInput, Alert, Platform } from 'react-native';
+import { useRouter } from 'expo-router';
+import * as SecureStore from 'expo-secure-store';
 import { getPerfilUsuario, updatePerfilUsuario } from '../../src/api/usuarioService';
 import { perfilStyles as styles } from '../../src/styles/perfilStyles';
 import { theme } from '../../src/styles/theme';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function PerfilScreen() {
+    const router = useRouter();
+
     const [perfil, setPerfil] = useState(null);
     const [cargando, setCargando] = useState(true);
 
@@ -44,8 +48,8 @@ export default function PerfilScreen() {
             };
 
             const perfilActualizado = await updatePerfilUsuario(request);
-            setPerfil(perfilActualizado); // Actualizamos la vista al instante
-            setModalVisible(false); // Cerramos la ventana
+            setPerfil(perfilActualizado);
+            setModalVisible(false);
             Alert.alert("¡Éxito!", "Tus datos han sido actualizados en la base de datos.");
         } catch (error) {
             Alert.alert("Error", "No se pudo actualizar el perfil.");
@@ -54,7 +58,37 @@ export default function PerfilScreen() {
         }
     };
 
-    // Pantalla de carga mientras Java responde
+    const handleLogout = () => {
+        const ejecutarSalida = async () => {
+            try {
+                if (Platform.OS === 'web') {
+                    localStorage.removeItem('userToken');
+                    localStorage.removeItem('userName');
+                } else {
+                    await SecureStore.deleteItemAsync('userToken');
+                    await SecureStore.deleteItemAsync('userName');
+                }
+                router.replace('/');
+            } catch (error) {
+                console.error("Error al cerrar sesión", error);
+            }
+        };
+
+        if (Platform.OS === 'web') {
+            const confirmar = window.confirm("¿Estás seguro de que quieres cerrar sesión?");
+            if (confirmar) ejecutarSalida();
+        } else {
+            Alert.alert(
+                "Cerrar Sesión",
+                "¿Estás seguro de que quieres cerrar sesión?",
+                [
+                    { text: "Cancelar", style: "cancel" },
+                    { text: "Sí, salir", style: "destructive", onPress: ejecutarSalida }
+                ]
+            );
+        }
+    };
+
     if (cargando) {
         return (
             <View style={styles.centerContainer}>
@@ -65,7 +99,6 @@ export default function PerfilScreen() {
 
     return (
         <View style={styles.container}>
-            {/* SECCIÓN 1: Foto y datos básicos */}
             <View style={styles.header}>
                 <View style={styles.avatarCircle}>
                     <Text style={styles.avatarText}>{perfil?.nombre?.charAt(0).toUpperCase() || 'U'}</Text>
@@ -74,7 +107,6 @@ export default function PerfilScreen() {
                 <Text style={styles.emailText}>{perfil?.email || 'Sin email'}</Text>
             </View>
 
-            {/* SECCIÓN 2: Tarjeta de medidas físicas */}
             <View style={styles.statsCard}>
                 <View style={styles.statBox}>
                     <Text style={styles.statLabel}>Peso</Text>
@@ -87,13 +119,17 @@ export default function PerfilScreen() {
                 </View>
             </View>
 
-            {/* BOTÓN: Abre la ventana de edición */}
             <TouchableOpacity style={styles.editButton} onPress={() => setModalVisible(true)}>
                 <Ionicons name="pencil-outline" size={20} color="white" />
                 <Text style={styles.editButtonText}>Editar Perfil</Text>
             </TouchableOpacity>
 
-            {/* VENTANA EMERGENTE (MODAL) PARA EDITAR */}
+            <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+                <Ionicons name="log-out-outline" size={20} color="white" />
+                <Text style={styles.logoutButtonText}>Cerrar Sesión</Text>
+            </TouchableOpacity>
+
+            {/* Modal de edición */}
             <Modal animationType="slide" transparent={true} visible={modalVisible}>
                 <View style={styles.modalOverlay}>
                     <View style={styles.modalContent}>
