@@ -72,7 +72,7 @@ export default function RegisterScreen() {
                 {cargando ? <ActivityIndicator color="white" /> : <Text style={styles.buttonText}>Registrarse</Text>}
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.linkButton} onPress={() => router.back()} disabled={cargando}>
+            <TouchableOpacity style={styles.linkButton} onPress={() => router.push('/login')}>
                 <Text style={styles.linkText}>¿Ya tienes cuenta? Inicia sesión aquí</Text>
             </TouchableOpacity>
         </ScrollView>
