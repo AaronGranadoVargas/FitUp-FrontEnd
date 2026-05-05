@@ -2,36 +2,101 @@ import { StyleSheet } from 'react-native';
 import { theme } from './theme';
 
 export const homeStyles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: theme.colors.fondoBase },
-    content: { padding: 20, paddingTop: 60, paddingBottom: 40 },
-    header: { marginBottom: 25 },
-    dateText: { color: theme.colors.grisTexto, fontSize: 14, fontWeight: 'bold', letterSpacing: 1, textTransform: 'uppercase' },
-    greeting: { color: theme.colors.grisOscuro, fontSize: 28, fontWeight: 'bold', marginTop: 5 },
-
-    card: {
-        backgroundColor: theme.colors.blanco,
-        borderRadius: theme.borderRadius.tarjeta,
-        padding: 20,
-        marginBottom: 20,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.05,
-        shadowRadius: 10,
-        elevation: 3,
+    container: {
+        flex: 1,
+        backgroundColor: theme.colors.fondoBase
     },
-    primaryCard: { backgroundColor: theme.colors.naranja, minHeight: 180 },
-    secondaryCard: { backgroundColor: theme.colors.verdeSalvia, minHeight: 120, justifyContent: 'center' },
+    scrollContent: {
+        flexGrow: 1,
+        padding: 20,
+        alignItems: 'center',
+        paddingBottom: 40
+    },
+    wrapper: {
+        width: '100%',
+        maxWidth: 600,
+    },
 
-    row: { flexDirection: 'row', justifyContent: 'space-between' },
-    halfCard: { width: '48%', minHeight: 140, justifyContent: 'center', alignItems: 'center' },
+    header: {
+        marginTop: 20,
+        marginBottom: 25
+    },
+    dateText: {
+        fontSize: 14,
+        color: theme.colors.naranja,
+        fontWeight: 'bold',
+        letterSpacing: 1.5,
+        textTransform: 'uppercase',
+        marginBottom: 5
+    },
+    greeting: {
+        fontSize: 32,
+        fontWeight: '900',
+        color: '#333'
+    },
 
-    cardPlaceholder: { backgroundColor: 'rgba(255,255,255,0.3)', height: 60, borderRadius: 10, marginTop: 20 },
+    primaryCard: {
+        backgroundColor: theme.colors.naranja,
+        borderRadius: 20,
+        padding: 25,
+        marginBottom: 25,
+        elevation: 6,
+        shadowColor: theme.colors.naranja,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.4,
+        shadowRadius: 8,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+    },
+    primaryCardTextContainer: { flex: 1 },
+    cardTitleWhite: { color: 'white', fontSize: 16, fontWeight: '600', opacity: 0.9, marginBottom: 5 },
+    cardSubtitleWhite: { color: 'white', fontSize: 24, fontWeight: 'bold', marginBottom: 15 },
+    playButton: {
+        backgroundColor: 'white',
+        borderRadius: 50,
+        width: 50,
+        height: 50,
+        justifyContent: 'center',
+        alignItems: 'center',
+        elevation: 3
+    },
 
-    cardTitle: { fontSize: 18, fontWeight: 'bold', color: theme.colors.grisOscuro },
-    metricText: { fontSize: 24, fontWeight: 'bold', color: theme.colors.naranja, marginTop: 10 },
-    cardTitleWhite: { fontSize: 22, fontWeight: 'bold', color: theme.colors.blanco },
-    cardSubtitleWhite: { fontSize: 16, color: 'rgba(255,255,255,0.8)', marginTop: 5 },
+    statsGrid: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 25
+    },
+    statCard: {
+        backgroundColor: 'white',
+        borderRadius: 18,
+        padding: 20,
+        width: '48%',
+        elevation: 2,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 5,
+    },
+    statHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
+    statTitle: { fontSize: 16, color: '#666', fontWeight: '600', marginLeft: 8 },
+    statValue: { fontSize: 26, fontWeight: 'bold', color: '#333' },
+    statUnit: { fontSize: 14, color: '#888', fontWeight: 'normal' },
 
-    logoutButton: { marginTop: 20, padding: 15, alignItems: 'center' },
-    logoutText: { color: '#FF3B30', fontWeight: 'bold', fontSize: 16 }
+    secondaryCard: {
+        backgroundColor: 'white',
+        borderRadius: 20,
+        padding: 20,
+        elevation: 2,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 5,
+    },
+    sectionTitle: { fontSize: 18, fontWeight: 'bold', color: '#333', marginBottom: 15 },
+    weekRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+    dayBubble: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#F0F0F0', justifyContent: 'center', alignItems: 'center' },
+    dayBubbleActive: { backgroundColor: theme.colors.naranja },
+    dayText: { color: '#888', fontWeight: 'bold', fontSize: 14 },
+    dayTextActive: { color: 'white', fontWeight: 'bold', fontSize: 14 }
 });
