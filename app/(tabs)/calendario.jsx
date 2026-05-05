@@ -52,9 +52,9 @@ export default function CalendarioScreen() {
         ...entrenamientosMarcados,
         [diaSeleccionado]: {
             ...entrenamientosMarcados[diaSeleccionado],
-            selected: true,
+            selected: false,
             selectedColor: theme.colors.naranja,
-            disableTouchEvent: true
+            disableTouchEvent: false
         }
     };
 
