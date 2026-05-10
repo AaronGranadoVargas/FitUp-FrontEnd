@@ -62,41 +62,60 @@ export const homeStyles = StyleSheet.create({
         elevation: 3
     },
 
-    statsGrid: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginBottom: 25
-    },
-    statCard: {
-        backgroundColor: 'white',
-        borderRadius: 18,
-        padding: 20,
-        width: '48%',
-        elevation: 2,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 5,
-    },
-    statHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
-    statTitle: { fontSize: 16, color: '#666', fontWeight: '600', marginLeft: 8 },
-    statValue: { fontSize: 26, fontWeight: 'bold', color: '#333' },
-    statUnit: { fontSize: 14, color: '#888', fontWeight: 'normal' },
-
-    secondaryCard: {
-        backgroundColor: 'white',
+    shopBanner: {
+        backgroundColor: '#1E1E1E',
         borderRadius: 20,
         padding: 20,
-        elevation: 2,
+        marginBottom: 25,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        elevation: 5,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 5,
+        borderLeftWidth: 5,
+        borderLeftColor: theme.colors.naranja
+    },
+    shopBannerTextContainer: {
+        flex: 1,
+        marginRight: 15
+    },
+    shopBannerTitle: {
+        color: 'white',
+        fontSize: 20,
+        fontWeight: 'bold',
+        marginBottom: 5
+    },
+    shopBannerSubtitle: {
+        color: '#AAA',
+        fontSize: 14
+    },
+    shopIconContainer: {
+        backgroundColor: 'rgba(255,255,255,0.1)',
+        padding: 12,
+        borderRadius: 15
+    },
+
+    sectionTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#333',
+        marginBottom: 15,
+        marginTop: 5,
+        marginLeft: 5
+    },
+    miniCalendarCard: {
+        backgroundColor: 'white',
+        borderRadius: 20,
+        padding: 10,
+        elevation: 3,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 5,
-    },
-    sectionTitle: { fontSize: 18, fontWeight: 'bold', color: '#333', marginBottom: 15 },
-    weekRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-    dayBubble: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#F0F0F0', justifyContent: 'center', alignItems: 'center' },
-    dayBubbleActive: { backgroundColor: theme.colors.naranja },
-    dayText: { color: '#888', fontWeight: 'bold', fontSize: 14 },
-    dayTextActive: { color: 'white', fontWeight: 'bold', fontSize: 14 }
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        marginBottom: 20,
+        overflow: 'hidden'
+    }
 });

@@ -45,7 +45,6 @@ export const authStyles = StyleSheet.create({
         textAlign: 'center'
     },
 
-    // Inputs
     input: {
         backgroundColor: theme.colors.blanco,
         padding: 16,
@@ -59,7 +58,6 @@ export const authStyles = StyleSheet.create({
     row: { flexDirection: 'row', justifyContent: 'space-between' },
     halfInput: { width: '48%' },
 
-    // Botones
     button: {
         backgroundColor: theme.colors.naranja,
         paddingVertical: 16,

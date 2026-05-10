@@ -1,63 +1,70 @@
 import { View, Text, ScrollView, Platform, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { useEffect, useState } from 'react';
-import { useRouter } from 'expo-router';
+import { useState, useCallback } from 'react';
+import { useRouter, useFocusEffect } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import { Ionicons } from '@expo/vector-icons';
+import { Calendar, LocaleConfig } from 'react-native-calendars';
 import { homeStyles as styles } from '../../src/styles/homeStyles';
 import { theme } from '../../src/styles/theme';
+import { getMisEntrenamientos, getEntrenamientoPorFecha } from '../../src/api/entrenamientoService';
 
 export default function HomeScreen() {
     const router = useRouter();
     const [nombreUsuario, setNombreUsuario] = useState('');
     const [cargando, setCargando] = useState(true);
 
-    const [estadisticas, setEstadisticas] = useState({
-        calorias: 0,
-        pasos: 0,
-        entrenamientoHoy: 'Pierna y Glúteo',
-        diasEntrenados: [false, true, false, true, false, false, false]
-    });
+    const [entrenamientoHoy, setEntrenamientoHoy] = useState(null);
+    const [marcasCalendario, setMarcasCalendario] = useState({});
 
-    const obtenerFechaActual = () => {
+    const obtenerFechaFormateada = () => {
+        const d = new Date();
+        const anio = d.getFullYear();
+        const mes = String(d.getMonth() + 1).padStart(2, '0');
+        const dia = String(d.getDate()).padStart(2, '0');
+        return `${anio}-${mes}-${dia}`;
+    };
+
+    const obtenerTextoFecha = () => {
         const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
         const fecha = new Date();
         return `${fecha.getDate()} ${meses[fecha.getMonth()]}`;
     };
 
-    useEffect(() => {
-        const inicializarPantalla = async () => {
-            try {
-                let nombreGuardado = Platform.OS === 'web'
-                    ? localStorage.getItem('userName')
-                    : await SecureStore.getItemAsync('userName');
+    useFocusEffect(
+        useCallback(() => {
+            const sincronizarDashboard = async () => {
+                try {
+                    let nombreGuardado = Platform.OS === 'web'
+                        ? localStorage.getItem('userName')
+                        : await SecureStore.getItemAsync('userName');
+                    if (nombreGuardado) setNombreUsuario(nombreGuardado);
 
-                if (nombreGuardado) setNombreUsuario(nombreGuardado);
+                    const lista = await getMisEntrenamientos();
+                    const marcas = {};
+                    lista.forEach(ent => {
+                        marcas[ent.fecha] = { marked: true, dotColor: theme.colors.naranja };
+                    });
+                    setMarcasCalendario(marcas);
 
-                await cargarDatosDashboard();
+                    const hoyString = obtenerFechaFormateada();
+                    const datosHoy = await getEntrenamientoPorFecha(hoyString);
 
-            } catch (error) {
-                console.error("Error cargando el Home:", error);
-            } finally {
-                setCargando(false);
-            }
-        };
+                    if (datosHoy && datosHoy.notas && datosHoy.notas.trim() !== "") {
+                        setEntrenamientoHoy(datosHoy.notas);
+                    } else {
+                        setEntrenamientoHoy(null);
+                    }
 
-        inicializarPantalla();
-    }, []);
+                } catch (error) {
+                    console.error("Error sincronizando Home:", error);
+                } finally {
+                    setCargando(false);
+                }
+            };
 
-    const cargarDatosDashboard = async () => {
-        return new Promise(resolve => {
-            setTimeout(() => {
-                setEstadisticas({
-                    calorias: 450,
-                    pasos: 8432,
-                    entrenamientoHoy: 'Pierna y Glúteo',
-                    diasEntrenados: [true, true, false, true, false, false, false]
-                });
-                resolve();
-            }, 800);
-        });
-    };
+            sincronizarDashboard();
+        }, [])
+    );
 
     if (cargando) {
         return (
@@ -69,61 +76,67 @@ export default function HomeScreen() {
 
     return (
         <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-
             <View style={styles.wrapper}>
 
                 <View style={styles.header}>
-                    <Text style={styles.dateText}>{obtenerFechaActual()}</Text>
+                    <Text style={styles.dateText}>{obtenerTextoFecha()}</Text>
                     <Text style={styles.greeting}>
                         ¡Hola {nombreUsuario ? nombreUsuario.split(' ')[0] : 'de nuevo'}! 👋
                     </Text>
                 </View>
 
                 <TouchableOpacity
-                    style={styles.primaryCard}
+                    style={[styles.primaryCard, !entrenamientoHoy && { backgroundColor: '#555' }]}
                     activeOpacity={0.8}
-                    onPress={() => alert("Aquí abriremos la rutina")}
+                    onPress={() => router.push('/calendario')}
                 >
                     <View style={styles.primaryCardTextContainer}>
-                        <Text style={styles.cardTitleWhite}>Tu entrenamiento de hoy</Text>
-                        <Text style={styles.cardSubtitleWhite}>{estadisticas.entrenamientoHoy}</Text>
-                        <Text style={styles.cardTitleWhite}><Ionicons name="time-outline" size={14} /> 45 min</Text>
+                        <Text style={styles.cardTitleWhite}>
+                            {entrenamientoHoy ? "Tu plan para hoy" : "Día de descanso"}
+                        </Text>
+                        <Text style={styles.cardSubtitleWhite} numberOfLines={2}>
+                            {entrenamientoHoy ? entrenamientoHoy : "No has programado nada"}
+                        </Text>
+                        <Text style={styles.cardTitleWhite}>
+                            <Ionicons name="calendar-outline" size={14} />
+                            {entrenamientoHoy ? " Ver detalles" : " Ir al calendario"}
+                        </Text>
                     </View>
                     <View style={styles.playButton}>
-                        <Ionicons name="play" size={24} color={theme.colors.naranja} style={{ marginLeft: 3 }} />
+                        <Ionicons
+                            name={entrenamientoHoy ? "play" : "add"}
+                            size={24}
+                            color={entrenamientoHoy ? theme.colors.naranja : "#555"}
+                            style={{ marginLeft: entrenamientoHoy ? 3 : 0 }}
+                        />
                     </View>
                 </TouchableOpacity>
 
-                <View style={styles.statsGrid}>
-                    <View style={styles.statCard}>
-                        <View style={styles.statHeader}>
-                            <Ionicons name="flame" size={20} color="#FF9500" />
-                            <Text style={styles.statTitle}>Calorías</Text>
-                        </View>
-                        <Text style={styles.statValue}>{estadisticas.calorias} <Text style={styles.statUnit}>kcal</Text></Text>
+                <TouchableOpacity style={styles.shopBanner} activeOpacity={0.8} onPress={() => alert("Ir a la Tienda")}>
+                    <View style={styles.shopBannerTextContainer}>
+                        <Text style={styles.shopBannerTitle}>Visita la Tienda</Text>
+                        <Text style={styles.shopBannerSubtitle}>Suplementación y ropa deportiva.</Text>
                     </View>
+                    <View style={styles.shopIconContainer}>
+                        <Ionicons name="cart-outline" size={32} color={theme.colors.naranja} />
+                    </View>
+                </TouchableOpacity>
 
-                    <View style={styles.statCard}>
-                        <View style={styles.statHeader}>
-                            <Ionicons name="footsteps" size={20} color="#34C759" />
-                            <Text style={styles.statTitle}>Pasos</Text>
-                        </View>
-                        <Text style={styles.statValue}>{estadisticas.pasos}</Text>
-                    </View>
-                </View>
-
-                <View style={styles.secondaryCard}>
-                    <Text style={styles.sectionTitle}>Progreso Semanal</Text>
-                    <View style={styles.weekRow}>
-                        {['L', 'M', 'X', 'J', 'V', 'S', 'D'].map((dia, index) => {
-                            const entrenado = estadisticas.diasEntrenados[index];
-                            return (
-                                <View key={index} style={[styles.dayBubble, entrenado && styles.dayBubbleActive]}>
-                                    <Text style={entrenado ? styles.dayTextActive : styles.dayText}>{dia}</Text>
-                                </View>
-                            );
-                        })}
-                    </View>
+                <Text style={styles.sectionTitle}>Historial del Mes</Text>
+                <View style={styles.miniCalendarCard}>
+                    <Calendar
+                        hideArrows={true}
+                        disableMonthChange={true}
+                        onDayPress={() => router.push('/calendario')}
+                        markedDates={marcasCalendario}
+                        theme={{
+                            todayTextColor: theme.colors.naranja,
+                            dotColor: theme.colors.naranja,
+                            selectedDayBackgroundColor: theme.colors.naranja,
+                            monthTextColor: '#333',
+                            textMonthFontWeight: 'bold',
+                        }}
+                    />
                 </View>
 
             </View>

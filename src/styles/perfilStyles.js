@@ -33,7 +33,6 @@ export const perfilStyles = StyleSheet.create({
     statUnit: {fontSize: 16, color: '#666', fontWeight: 'normal'},
     divider: {width: 1, backgroundColor: '#E0E0E0', marginHorizontal: 15},
 
-    // --- BOTÓN DE EDITAR MEJORADO ---
     editButton: {
         flexDirection: 'row',
         backgroundColor: theme.colors.naranja,
@@ -41,13 +40,12 @@ export const perfilStyles = StyleSheet.create({
         borderRadius: 10,
         justifyContent: 'center',
         alignItems: 'center',
-        alignSelf: 'center', // Lo centra en la pantalla
-        width: '100%',       // Ocupa todo el espacio disponible...
-        maxWidth: 350,       // ...pero nunca más de 350 píxeles (perfecto para PC)
+        alignSelf: 'center',
+        width: '100%',
+        maxWidth: 350,
     },
     editButtonText: {color: 'white', fontWeight: 'bold', fontSize: 16, marginLeft: 10},
 
-    // --- BOTÓN DE CERRAR SESIÓN MEJORADO ---
     logoutButton: {
         flexDirection: 'row',
         backgroundColor: '#FF3B30',
@@ -55,9 +53,9 @@ export const perfilStyles = StyleSheet.create({
         borderRadius: 10,
         justifyContent: 'center',
         alignItems: 'center',
-        alignSelf: 'center', // Lo centra en la pantalla
-        width: '100%',       // Ocupa todo el espacio disponible...
-        maxWidth: 350,       // ...pero nunca más de 350 píxeles (perfecto para PC)
+        alignSelf: 'center',
+        width: '100%',
+        maxWidth: 350,
         marginTop: 20,
         elevation: 3
     },
