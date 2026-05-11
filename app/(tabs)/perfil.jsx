@@ -1,11 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, ActivityIndicator, Modal, TextInput, Alert, Platform } from 'react-native';
-import { useRouter } from 'expo-router';
+import React, {useState, useEffect} from 'react';
+import {
+    View,
+    Text,
+    TouchableOpacity,
+    ActivityIndicator,
+    Modal,
+    TextInput,
+    Alert,
+    Platform,
+    ScrollView
+} from 'react-native';
+import {useRouter} from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
-import { getPerfilUsuario, updatePerfilUsuario } from '../../src/api/usuarioService';
-import { perfilStyles as styles } from '../../src/styles/perfilStyles';
-import { theme } from '../../src/styles/theme';
-import { Ionicons } from '@expo/vector-icons';
+import {getPerfilUsuario, updatePerfilUsuario} from '../../src/api/usuarioService';
+import {perfilStyles as styles} from '../../src/styles/perfilStyles';
+import {theme} from '../../src/styles/theme';
+import {Ionicons} from '@expo/vector-icons';
 
 export default function PerfilScreen() {
     const router = useRouter();
@@ -14,7 +24,14 @@ export default function PerfilScreen() {
     const [cargando, setCargando] = useState(true);
 
     const [modalVisible, setModalVisible] = useState(false);
-    const [formEdit, setFormEdit] = useState({ nombre: '', peso: '', altura: '' });
+    const [formEdit, setFormEdit] = useState({
+        nombre: '',
+        peso: '',
+        altura: '',
+        telefono: '',
+        ciudad: '',
+        correo: ''
+    });
     const [guardando, setGuardando] = useState(false);
 
     useEffect(() => {
@@ -29,7 +46,10 @@ export default function PerfilScreen() {
             setFormEdit({
                 nombre: datos.nombre || '',
                 peso: datos.peso ? datos.peso.toString() : '',
-                altura: datos.altura ? datos.altura.toString() : ''
+                altura: datos.altura ? datos.altura.toString() : '',
+                telefono: datos.telefono || '',
+                ciudad: datos.ciudad || '',
+                correo: datos.correo || ''
             });
         } catch (error) {
             Alert.alert("Error", "No se pudieron cargar los datos del perfil.");
@@ -44,7 +64,10 @@ export default function PerfilScreen() {
             const request = {
                 nombre: formEdit.nombre,
                 peso: formEdit.peso ? parseFloat(formEdit.peso) : null,
-                altura: formEdit.altura ? parseFloat(formEdit.altura) : null
+                altura: formEdit.altura ? parseFloat(formEdit.altura) : null,
+                telefono: formEdit.telefono || null,
+                ciudad: formEdit.ciudad || null,
+                correo: formEdit.correo || null
             };
 
             const perfilActualizado = await updatePerfilUsuario(request);
@@ -58,9 +81,15 @@ export default function PerfilScreen() {
         }
     };
 
+    const handleTelefonoChange = (texto) => {
+        const soloNumeros = texto.replace(/[^0-9]/g, '');
+        setFormEdit({...formEdit, telefono: soloNumeros});
+    };
+
     const handleLogout = () => {
         const ejecutarSalida = async () => {
             try {
+
                 if (Platform.OS === 'web') {
                     localStorage.removeItem('userToken');
                     localStorage.removeItem('userName');
@@ -82,8 +111,8 @@ export default function PerfilScreen() {
                 "Cerrar Sesión",
                 "¿Estás seguro de que quieres cerrar sesión?",
                 [
-                    { text: "Cancelar", style: "cancel" },
-                    { text: "Sí, salir", style: "destructive", onPress: ejecutarSalida }
+                    {text: "Cancelar", style: "cancel"},
+                    {text: "Sí, salir", style: "destructive", onPress: ejecutarSalida}
                 ]
             );
         }
@@ -92,12 +121,13 @@ export default function PerfilScreen() {
     if (cargando) {
         return (
             <View style={styles.centerContainer}>
-                <ActivityIndicator size="large" color={theme.colors.naranja} />
+                <ActivityIndicator size="large" color={theme.colors.naranja}/>
             </View>
         );
     }
 
     return (
+
         <View style={styles.container}>
             <View style={styles.header}>
                 <View style={styles.avatarCircle}>
@@ -112,27 +142,48 @@ export default function PerfilScreen() {
                     <Text style={styles.statLabel}>Peso</Text>
                     <Text style={styles.statValue}>{perfil?.peso || '--'} <Text style={styles.statUnit}>kg</Text></Text>
                 </View>
-                <View style={styles.divider} />
+                <View style={styles.divider}/>
                 <View style={styles.statBox}>
                     <Text style={styles.statLabel}>Altura</Text>
-                    <Text style={styles.statValue}>{perfil?.altura || '--'} <Text style={styles.statUnit}>cm</Text></Text>
+                    <Text style={styles.statValue}>{perfil?.altura || '--'} <Text
+                        style={styles.statUnit}>cm</Text></Text>
+                </View>
+            </View>
+            <View style={styles.infoCard}>
+                <View style={styles.infoRow}>
+                    <View style={styles.infoBox}>
+                        <Text style={styles.infoLabel}>Teléfono</Text>
+                        <Text style={styles.infoValue}>{perfil?.telefono || '--'}</Text>
+                    </View>
+                    <View style={styles.dividerVertical} />
+                    <View style={styles.infoBox}>
+                        <Text style={styles.infoLabel}>Ciudad</Text>
+                        <Text style={styles.infoValue}>{perfil?.ciudad || '--'}</Text>
+                    </View>
+                </View>
+                <View style={styles.infoRow}>
+                    <View style={styles.infoBox}>
+                        <Text style={styles.infoLabel}>Correo</Text>
+                        <Text style={styles.infoValue}>{perfil?.correo || '--'}</Text>
+                    </View>
                 </View>
             </View>
 
             <TouchableOpacity style={styles.editButton} onPress={() => setModalVisible(true)}>
-                <Ionicons name="pencil-outline" size={20} color="white" />
+                <Ionicons name="pencil-outline" size={20} color="white"/>
                 <Text style={styles.editButtonText}>Editar Perfil</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-                <Ionicons name="log-out-outline" size={20} color="white" />
+                <Ionicons name="log-out-outline" size={20} color="white"/>
                 <Text style={styles.logoutButtonText}>Cerrar Sesión</Text>
             </TouchableOpacity>
 
             {/* Modal de edición */}
             <Modal animationType="slide" transparent={true} visible={modalVisible}>
                 <View style={styles.modalOverlay}>
-                    <View style={styles.modalContent}>
+                    <ScrollView contentContainerStyle={styles.modalContent} keyboardShouldPersistTaps="handled">
+                        <Text style={styles.modalTitle}>Editar Perfil</Text>
                         <Text style={styles.modalTitle}>Editar Datos Físicos</Text>
 
                         <Text style={styles.inputLabel}>Nombre</Text>
@@ -141,7 +192,32 @@ export default function PerfilScreen() {
                             value={formEdit.nombre}
                             onChangeText={(text) => setFormEdit({...formEdit, nombre: text})}
                         />
+                        <Text style={styles.inputLabel}>Teléfono</Text>
+                        <TextInput
+                            style={styles.input}
+                            keyboardType="phone-pad"
+                            value={formEdit.telefono}
+                            onChangeText={handleTelefonoChange}  // Cambiado para usar la función de filtro
+                            placeholder="Tu número de teléfono"
+                        />
 
+                        <Text style={styles.inputLabel}>Ciudad</Text>
+                        <TextInput
+                            style={styles.input}
+                            value={formEdit.ciudad}
+                            onChangeText={(text) => setFormEdit({...formEdit, ciudad: text})}
+                            placeholder="Tu ciudad"
+                        />
+
+                        <Text style={styles.inputLabel}>Correo electrónico</Text>
+                        <TextInput
+                            style={styles.input}
+                            keyboardType="email-address"
+                            autoCapitalize="none"
+                            value={formEdit.correo}  // Cambiado de 'ocupacion'
+                            onChangeText={(text) => setFormEdit({...formEdit, correo: text})}  // Cambiado
+                            placeholder="Tu correo electrónico"
+                        />
                         <Text style={styles.inputLabel}>Peso (kg)</Text>
                         <TextInput
                             style={styles.input}
@@ -163,13 +239,17 @@ export default function PerfilScreen() {
                                 <Text style={styles.cancelButtonText}>Cancelar</Text>
                             </TouchableOpacity>
 
-                            <TouchableOpacity style={styles.saveButton} onPress={handleGuardarCambios} disabled={guardando}>
-                                {guardando ? <ActivityIndicator color="white" /> : <Text style={styles.saveButtonText}>Guardar</Text>}
+                            <TouchableOpacity style={styles.saveButton} onPress={handleGuardarCambios}
+                                              disabled={guardando}>
+                                {guardando ? <ActivityIndicator color="white"/> :
+                                    <Text style={styles.saveButtonText}>Guardar</Text>}
                             </TouchableOpacity>
                         </View>
-                    </View>
+                    </ScrollView>
+
                 </View>
             </Modal>
         </View>
-    );
+    )
+        ;
 }

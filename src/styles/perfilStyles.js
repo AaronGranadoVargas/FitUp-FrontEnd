@@ -95,5 +95,17 @@ export const perfilStyles = StyleSheet.create({
         marginLeft: 10,
         alignItems: 'center'
     },
-    saveButtonText: {color: 'white', fontWeight: 'bold', fontSize: 16}
+    saveButtonText: {color: 'white', fontWeight: 'bold', fontSize: 16},  // Agrega esta coma
+    infoCard: {
+        backgroundColor: 'white',
+        borderRadius: 15,
+        padding: 20,
+        elevation: 2,
+        marginBottom: 30
+    },
+    infoRow: { flexDirection: 'row', marginBottom: 15 },
+    infoBox: { flex: 1, alignItems: 'center' },
+    infoLabel: { fontSize: 14, color: '#888', textTransform: 'uppercase', marginBottom: 5 },
+    infoValue: { fontSize: 18, fontWeight: 'bold', color: '#333' },
+    dividerVertical: { width: 1, backgroundColor: '#E0E0E0', marginHorizontal: 15 }
 });

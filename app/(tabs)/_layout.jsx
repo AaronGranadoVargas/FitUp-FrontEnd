@@ -45,34 +45,103 @@ export default function TabLayout() {
             headerShown: false,
             tabBarActiveTintColor: theme.colors.naranja,
             tabBarInactiveTintColor: theme.colors.grisTexto,
+            tabBarPosition: Platform.OS === 'web' ? 'top' : 'bottom',
+            tabBarShowLabel: false,
+            tabBarItemStyle: { justifyContent: 'center', alignItems: 'center', paddingTop: 15 },
             tabBarStyle: {
                 backgroundColor: theme.colors.blanco,
                 borderTopWidth: 0,
-                elevation: 10,
-                shadowOpacity: 0.1,
-                height: 65,
-                paddingBottom: 10,
+                elevation: 20,
+                shadowOpacity: 0.3,
+                shadowOffset: { width: 0, height: 8 },
+                shadowRadius: 12,
+                height: 80,
+                paddingBottom: 15,
             }
         }}>
             <Tabs.Screen
                 name="home"
                 options={{
-                    tabBarLabel: 'Inicio',
-                    tabBarIcon: ({ color }) => <Ionicons name="home-outline" size={26} color={color} />
+                    tabBarIcon: ({ color, focused }) => (
+                        focused ? (
+                            <View style={{
+                                width: 40,
+                                height: 40,
+                                borderRadius: 20,
+                                backgroundColor: theme.colors.naranja,  // Fondo naranja sólido
+                                justifyContent: 'center',
+                                alignItems: 'center'
+                            }}>
+                                <Ionicons name="home-outline" size={32} color={theme.colors.blanco} />  {/* Icono blanco */}
+                            </View>
+                        ) : (
+                            <Ionicons name="home-outline" size={28} color={color} />
+                        )
+                    )
                 }}
             />
             <Tabs.Screen
                 name="calendario"
                 options={{
-                    tabBarLabel: 'Calendario',
-                    tabBarIcon: ({ color }) => <Ionicons name="calendar-outline" size={26} color={color} />
+                    tabBarIcon: ({ color, focused }) => (
+                        focused ? (
+                            <View style={{
+                                width: 40,
+                                height: 40,
+                                borderRadius: 20,
+                                backgroundColor: theme.colors.naranja,  // Fondo naranja sólido
+                                justifyContent: 'center',
+                                alignItems: 'center'
+                            }}>
+                                <Ionicons name="calendar-outline" size={32} color={theme.colors.blanco} />  {/* Icono blanco */}
+                            </View>
+                        ) : (
+                            <Ionicons name="calendar-outline" size={28} color={color} />
+                        )
+                    )
                 }}
             />
             <Tabs.Screen
                 name="perfil"
                 options={{
-                    tabBarLabel: 'Perfil',
-                    tabBarIcon: ({ color }) => <Ionicons name="person-outline" size={26} color={color} />
+                    tabBarIcon: ({ color, focused }) => (
+                        focused ? (
+                            <View style={{
+                                width: 40,
+                                height: 40,
+                                borderRadius: 20,
+                                backgroundColor: theme.colors.naranja,  // Fondo naranja sólido
+                                justifyContent: 'center',
+                                alignItems: 'center'
+                            }}>
+                                <Ionicons name="person-outline" size={32} color={theme.colors.blanco} />  {/* Icono blanco */}
+                            </View>
+                        ) : (
+                            <Ionicons name="person-outline" size={28} color={color} />
+                        )
+                    )
+                }}
+            />
+
+            <Tabs.Screen
+                name="notas"
+                options={{
+                    tabBarIcon: ({ color, focused }) => (
+                        focused ? (
+                            <View style={{
+                                width: 40,
+                                height: 40,
+                                borderRadius: 20,
+                                backgroundColor: theme.colors.naranja,  // Fondo naranja sólido
+                                justifyContent: 'center',
+                                alignItems: 'center'
+                            }}>
+                                <Ionicons name="document-text-outline" size={32} color={theme.colors.blanco} />  {/* Icono blanco */}
+                            </View>
+                        ) : (
+                            <Ionicons name="document-text-outline" size={28} color={color} />
+                        )
+                    )
                 }}
             />
         </Tabs>
