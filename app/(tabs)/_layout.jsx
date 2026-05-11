@@ -60,6 +60,48 @@ export default function TabLayout() {
             }
         }}>
             <Tabs.Screen
+                name="tienda"
+                options={{
+                    tabBarIcon: ({ color, focused }) => (
+                        focused ? (
+                            <View style={{
+                                width: 40,
+                                height: 40,
+                                borderRadius: 20,
+                                backgroundColor: theme.colors.naranja,
+                                justifyContent: 'center',
+                                alignItems: 'center'
+                            }}>
+                                <Ionicons name="bag" size={32} color={theme.colors.blanco} />
+                            </View>
+                        ) : (
+                            <Ionicons name="bag-outline" size={28} color={color} />
+                        )
+                    )
+                }}
+            />
+            <Tabs.Screen
+                name="carrito"
+                options={{
+                    tabBarIcon: ({ color, focused }) => (
+                        focused ? (
+                            <View style={{
+                                width: 40,
+                                height: 40,
+                                borderRadius: 20,
+                                backgroundColor: theme.colors.naranja,
+                                justifyContent: 'center',
+                                alignItems: 'center'
+                            }}>
+                                <Ionicons name="card-outline" size={32} color={theme.colors.blanco} />
+                            </View>
+                        ) : (
+                            <Ionicons name="card-outline" size={28} color={color} />
+                        )
+                    )
+                }}
+            />
+            <Tabs.Screen
                 name="home"
                 options={{
                     tabBarIcon: ({ color, focused }) => (
@@ -122,28 +164,7 @@ export default function TabLayout() {
                     )
                 }}
             />
-
-            <Tabs.Screen
-                name="notas"
-                options={{
-                    tabBarIcon: ({ color, focused }) => (
-                        focused ? (
-                            <View style={{
-                                width: 40,
-                                height: 40,
-                                borderRadius: 20,
-                                backgroundColor: theme.colors.naranja,  // Fondo naranja sólido
-                                justifyContent: 'center',
-                                alignItems: 'center'
-                            }}>
-                                <Ionicons name="document-text-outline" size={32} color={theme.colors.blanco} />  {/* Icono blanco */}
-                            </View>
-                        ) : (
-                            <Ionicons name="document-text-outline" size={28} color={color} />
-                        )
-                    )
-                }}
-            />
         </Tabs>
+
     );
 }

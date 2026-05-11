@@ -47,9 +47,9 @@ export default function PerfilScreen() {
                 nombre: datos.nombre || '',
                 peso: datos.peso ? datos.peso.toString() : '',
                 altura: datos.altura ? datos.altura.toString() : '',
-                telefono: datos.telefono || '',
-                ciudad: datos.ciudad || '',
-                correo: datos.correo || ''
+                telefono: datos.telefono ? datos.telefono.toString() : '',
+                ciudad: datos.ciudad ? datos.ciudad.toString() : '',
+                correo: datos.correo ? datos.correo.toString() : '',
             });
         } catch (error) {
             Alert.alert("Error", "No se pudieron cargar los datos del perfil.");
@@ -65,17 +65,25 @@ export default function PerfilScreen() {
                 nombre: formEdit.nombre,
                 peso: formEdit.peso ? parseFloat(formEdit.peso) : null,
                 altura: formEdit.altura ? parseFloat(formEdit.altura) : null,
-                telefono: formEdit.telefono || null,
-                ciudad: formEdit.ciudad || null,
-                correo: formEdit.correo || null
+                telefono: formEdit.telefono ? parseFloat(formEdit.telefono) : null,
+                ciudad: formEdit.ciudad ? formEdit.ciudad.toString() : null,
+                correo: formEdit.correo ? formEdit.ciudad.toString() : null,
             };
 
-            const perfilActualizado = await updatePerfilUsuario(request);
-            setPerfil(perfilActualizado);
+            await updatePerfilUsuario(request);
+
+            setPerfil((prevPerfil) => ({
+                ...prevPerfil,
+                ...request,
+                email: request.correo || prevPerfil.email
+            }));
+            await cargarDatos();
+
             setModalVisible(false);
             Alert.alert("¡Éxito!", "Tus datos han sido actualizados en la base de datos.");
         } catch (error) {
             Alert.alert("Error", "No se pudo actualizar el perfil.");
+            console.error("Error actualizando perfil:", error);
         } finally {
             setGuardando(false);
         }
