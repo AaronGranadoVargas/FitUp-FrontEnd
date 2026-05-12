@@ -1,4 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useCallback, useRef } from 'react';
+import { View, Text, FlatList, ActivityIndicator, TouchableOpacity, StyleSheet, Animated, Image, useWindowDimensions } from 'react-native';
+import { useFocusEffect } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import { getProductos } from '../../src/api/tiendaService';
+import { agregarProductoCarrito } from '../../src/api/carritoService';
 
 const COLORS = {
     green: "#94A78E",
@@ -7,542 +12,150 @@ const COLORS = {
     greenLight: "#EDF2EB",
     gray: "#F5F5F3",
     grayText: "#888884",
+    red: "#EF4444",
+    orange: "#F97316"
 };
 
-export default function FitUpStore() {
-    const [products, setProducts] = useState([]);
-    const [loading, setLoading] = useState(true);
-
-    const [cart, setCart] = useState([]);
-    const [cartOpen, setCartOpen] = useState(false);
+export default function TiendaScreen() {
+    const { width } = useWindowDimensions();
+    const [productos, setProductos] = useState([]);
+    const [cargando, setCargando] = useState(true);
     const [showToast, setShowToast] = useState(false);
+    const fadeAnim = useRef(new Animated.Value(0)).current;
 
-    useEffect(() => {
-        const fetchProducts = async () => {
-            try {
-                const res = await fetch("http://localhost:3000/api/products");
-                const data = await res.json();
+    const numColumns = width > 700 ? 4 : 2;
+    const cardWidth = (width / numColumns) - (width > 700 ? 25 : 20);
 
-                setProducts(data);
-            } catch (err) {
-                console.error("Error cargando productos:", err);
-            } finally {
-                setLoading(false);
-            }
-        };
+    useFocusEffect(
+        useCallback(() => { cargarCatalogo(); }, [])
+    );
 
-        fetchProducts();
-    }, []);
+    const cargarCatalogo = async () => {
+        setCargando(true);
+        try {
+            const data = await getProductos();
+            setProductos(data);
+        } catch (e) { console.error(e); }
+        finally { setCargando(false); }
+    };
 
-    const addToCart = (product) => {
-        setCart((prev) => {
-            const exists = prev.find((item) => item.id === product.id);
+    const handleAddToCart = async (producto) => {
+        if (producto.stock <= 0) return;
+        try {
+            await agregarProductoCarrito(producto.id, 1);
+            mostrarToast();
+        } catch (error) { console.error(error); }
+    };
 
-            if (exists) {
-                return prev.map((item) =>
-                    item.id === product.id
-                        ? { ...item, qty: item.qty + 1 }
-                        : item
-                );
-            }
-
-            return [...prev, { ...product, qty: 1 }];
-        });
-
+    const mostrarToast = () => {
         setShowToast(true);
-
+        Animated.timing(fadeAnim, { toValue: 1, duration: 300, useNativeDriver: true }).start();
         setTimeout(() => {
-            setShowToast(false);
+            Animated.timing(fadeAnim, { toValue: 0, duration: 300, useNativeDriver: true }).start(() => { setShowToast(false); });
         }, 1500);
     };
 
-    const updateQty = (id, delta) => {
-        setCart((prev) =>
-            prev
-                .map((item) => {
-                    if (item.id === id) {
-                        const newQty = item.qty + delta;
+    const renderProducto = ({ item }) => {
+        const outOfStock = item.stock <= 0;
+        const lowStock = item.stock > 0 && item.stock < 5;
 
-                        return newQty > 0
-                            ? { ...item, qty: newQty }
-                            : null;
-                    }
+        return (
+            <View style={[styles.card, { width: cardWidth }]}>
+                <View style={styles.imageContainer}>
+                    {item.imagenUrl ? (
+                        <Image source={{ uri: item.imagenUrl }} style={styles.image} />
+                    ) : (
+                        <Ionicons name={item.categoria === 'ROPA' ? 'shirt-outline' : 'nutrition-outline'} size={32} color={COLORS.grayText} />
+                    )}
+                </View>
 
-                    return item;
-                })
-                .filter(Boolean)
+                <Text style={styles.title} numberOfLines={2}>{item.nombre}</Text>
+
+                {/* INDICADOR DE STOCK PROFESIONAL */}
+                <View style={styles.stockRow}>
+                    <View style={[styles.stockDot, { backgroundColor: outOfStock ? COLORS.red : lowStock ? COLORS.orange : COLORS.green }]} />
+                    <Text style={[styles.stockText, { color: outOfStock ? COLORS.red : COLORS.grayText }]}>
+                        {outOfStock ? 'Sin stock' : lowStock ? `¡Solo ${item.stock} uds!` : `Stock: ${item.stock}`}
+                    </Text>
+                </View>
+
+                <View style={styles.bottomRow}>
+                    <Text style={styles.price}>{item.precio.toFixed(2)} €</Text>
+                    <TouchableOpacity
+                        style={[styles.addButton, outOfStock && { opacity: 0.3 }]}
+                        onPress={() => handleAddToCart(item)}
+                        disabled={outOfStock}
+                    >
+                        <Ionicons name={outOfStock ? "close" : "add"} size={22} color={COLORS.white} />
+                    </TouchableOpacity>
+                </View>
+            </View>
         );
     };
 
-    const totalItems = cart.reduce((s, i) => s + i.qty, 0);
-
-    const totalPrice = cart.reduce(
-        (s, i) => s + i.precio * i.qty,
-        0
-    );
+    if (cargando) {
+        return (
+            <View style={styles.loaderContainer}>
+                <ActivityIndicator size="large" color={COLORS.dark} />
+            </View>
+        );
+    }
 
     return (
-        <div
-            style={{
-                minHeight: "100dvh",
-                background: "#FFFFFF",
-                color: COLORS.dark,
-                overflowX: "hidden",
-            }}
-        >
-            <style>{`
-                @import url('https://fonts.googleapis.com/css2?family=Syne:wght@800;900&family=DM+Sans:wght@400;700&display=swap');
-
-                * {
-                    box-sizing: border-box;
-                    margin: 0;
-                    padding: 0;
-                }
-
-                html, body {
-                    overflow-x: hidden;
-                    overflow-y: auto;
-                    -webkit-overflow-scrolling: touch;
-                    touch-action: pan-y;
-                    font-family: 'DM Sans', sans-serif;
-                    background: white;
-                }
-
-                #root {
-                    min-height: 100%;
-                }
-
-                .product-grid {
-                    display: grid;
-                    grid-template-columns: repeat(4, 1fr);
-                    gap: 24px;
-                    padding: 20px;
-                }
-
-                @media (max-width: 768px) {
-                    .product-grid {
-                        grid-template-columns: repeat(2, 1fr);
-                        gap: 12px;
-                        padding: 12px;
-                    }
-                }
-
-                @keyframes toastSlide {
-                    from {
-                        opacity: 0;
-                        transform: translateX(-50%) translateY(-20px);
-                    }
-
-                    to {
-                        opacity: 1;
-                        transform: translateX(-50%) translateY(0);
-                    }
-                }
-
-                button {
-                    -webkit-tap-highlight-color: transparent;
-                }
-            `}</style>
-
-            {/* TOAST */}
+        <View style={styles.container}>
             {showToast && (
-                <div
-                    style={{
-                        position: "fixed",
-                        top: 20,
-                        left: "50%",
-                        transform: "translateX(-50%)",
-                        background: COLORS.dark,
-                        color: "white",
-                        padding: "12px 24px",
-                        borderRadius: "50px",
-                        zIndex: 3000,
-                        fontSize: "14px",
-                        fontWeight: "bold",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "8px",
-                        animation: "toastSlide 0.3s ease",
-                        boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
-                    }}
-                >
-                    <span style={{ color: COLORS.green }}>●</span>
-                    Añadido con éxito
-                </div>
+                <Animated.View style={[styles.toast, { opacity: fadeAnim }]}>
+                    <Ionicons name="checkmark-circle" size={20} color={COLORS.green} />
+                    <Text style={styles.toastText}>Añadido al carrito</Text>
+                </Animated.View>
             )}
 
-            {/* HEADER */}
-            <header
-                style={{
-                    padding: "40px 24px 20px",
-                    maxWidth: "1200px",
-                    margin: "0 auto",
-                }}
-            >
-                <h1
-                    style={{
-                        fontFamily: "'Syne', sans-serif",
-                        fontWeight: 900,
-                        fontSize: "32px",
-                    }}
-                >
-                    FitUp Store
-                </h1>
-            </header>
+            <Text style={styles.headerTitle}>FitUp Store</Text>
 
-            {/* PRODUCTOS */}
-            <main
-                style={{
-                    maxWidth: "1200px",
-                    margin: "0 auto",
-                    paddingBottom: "120px",
-                }}
-            >
-                {loading ? (
-                    <div
-                        style={{
-                            textAlign: "center",
-                            padding: "60px",
-                            color: COLORS.grayText,
-                        }}
-                    >
-                        Cargando productos...
-                    </div>
-                ) : (
-                    <div className="product-grid">
-                        {products.map((p) => (
-                            <div
-                                key={p.id}
-                                style={{
-                                    background: "white",
-                                    borderRadius: "24px",
-                                    padding: "12px",
-                                    border: `1px solid ${COLORS.greenLight}`,
-                                    display: "flex",
-                                    flexDirection: "column",
-                                }}
-                            >
-                                <div
-                                    style={{
-                                        aspectRatio: "1/1",
-                                        background: COLORS.gray,
-                                        borderRadius: "18px",
-                                        overflow: "hidden",
-                                    }}
-                                >
-                                    <img
-                                        src={p.imagen}
-                                        alt={p.name}
-                                        style={{
-                                            width: "100%",
-                                            height: "100%",
-                                            objectFit: "cover",
-                                        }}
-                                    />
-                                </div>
-
-                                <h3
-                                    style={{
-                                        fontFamily: "'Syne', sans-serif",
-                                        fontSize: "14px",
-                                        margin: "12px 0 8px",
-                                    }}
-                                >
-                                    {p.name}
-                                </h3>
-
-                                <div
-                                    style={{
-                                        display: "flex",
-                                        justifyContent: "space-between",
-                                        alignItems: "center",
-                                        marginTop: "auto",
-                                    }}
-                                >
-                                    <span
-                                        style={{
-                                            fontFamily: "'Syne', sans-serif",
-                                            fontWeight: 900,
-                                            fontSize: "18px",
-                                        }}
-                                    >
-                                        {Number(p.precio).toFixed(2)}€
-                                    </span>
-
-                                    <button
-                                        onClick={() => addToCart(p)}
-                                        style={{
-                                            width: "35px",
-                                            height: "35px",
-                                            borderRadius: "10px",
-                                            border: "none",
-                                            background: COLORS.dark,
-                                            color: "white",
-                                            cursor: "pointer",
-                                            fontSize: "20px",
-                                        }}
-                                    >
-                                        +
-                                    </button>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                )}
-            </main>
-
-            {/* BOTON CARRITO */}
-            <div
-                style={{
-                    position: "fixed",
-                    bottom: "30px",
-                    left: "50%",
-                    transform: "translateX(-50%)",
-                    zIndex: 1000,
-                }}
-            >
-                <button
-                    onClick={() => setCartOpen(true)}
-                    style={{
-                        background: COLORS.dark,
-                        color: "white",
-                        border: "none",
-                        padding: "16px 28px",
-                        borderRadius: "50px",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "12px",
-                        boxShadow: "0 10px 30px rgba(0,0,0,0.3)",
-                        cursor: "pointer",
-                        fontWeight: "bold",
-                    }}
-                >
-                    Ver Carrito
-
-                    {totalItems > 0 && (
-                        <span
-                            style={{
-                                background: COLORS.green,
-                                color: COLORS.dark,
-                                borderRadius: "50%",
-                                width: "22px",
-                                height: "22px",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                fontSize: "12px",
-                            }}
-                        >
-                            {totalItems}
-                        </span>
-                    )}
-                </button>
-            </div>
-
-            {/* DRAWER */}
-            {cartOpen && (
-                <div
-                    style={{
-                        position: "fixed",
-                        inset: 0,
-                        zIndex: 2000,
-                        display: "flex",
-                        justifyContent: "flex-end",
-                    }}
-                >
-                    <div
-                        onClick={() => setCartOpen(false)}
-                        style={{
-                            position: "absolute",
-                            inset: 0,
-                            background: "rgba(0,0,0,0.4)",
-                            backdropFilter: "blur(4px)",
-                        }}
-                    />
-
-                    <div
-                        style={{
-                            position: "relative",
-                            width: "min(400px, 100%)",
-                            background: "white",
-                            height: "100dvh",
-                            overflow: "hidden",
-                            display: "flex",
-                            flexDirection: "column",
-                            boxShadow: "-10px 0 30px rgba(0,0,0,0.1)",
-                        }}
-                    >
-                        <div
-                            style={{
-                                padding: "24px",
-                                borderBottom: "1px solid #EEE",
-                                display: "flex",
-                                justifyContent: "space-between",
-                            }}
-                        >
-                            <h2
-                                style={{
-                                    fontFamily: "'Syne', sans-serif",
-                                }}
-                            >
-                                Carrito
-                            </h2>
-
-                            <button
-                                onClick={() => setCartOpen(false)}
-                                style={{
-                                    background: "none",
-                                    border: "none",
-                                    fontSize: "20px",
-                                    cursor: "pointer",
-                                }}
-                            >
-                                ✕
-                            </button>
-                        </div>
-
-                        <div
-                            style={{
-                                flex: 1,
-                                overflowY: "auto",
-                                padding: "20px",
-                            }}
-                        >
-                            {cart.length === 0 ? (
-                                <div
-                                    style={{
-                                        color: COLORS.grayText,
-                                        textAlign: "center",
-                                        marginTop: "40px",
-                                    }}
-                                >
-                                    El carrito está vacío
-                                </div>
-                            ) : (
-                                cart.map((item) => (
-                                    <div
-                                        key={item.id}
-                                        style={{
-                                            display: "flex",
-                                            gap: "15px",
-                                            marginBottom: "20px",
-                                            alignItems: "center",
-                                        }}
-                                    >
-                                        <div
-                                            style={{
-                                                width: "50px",
-                                                height: "50px",
-                                                background: COLORS.gray,
-                                                borderRadius: "10px",
-                                                overflow: "hidden",
-                                            }}
-                                        >
-                                            <img
-                                                src={item.imagen}
-                                                alt={item.name}
-                                                style={{
-                                                    width: "100%",
-                                                    height: "100%",
-                                                    objectFit: "cover",
-                                                }}
-                                            />
-                                        </div>
-
-                                        <div style={{ flex: 1 }}>
-                                            <div
-                                                style={{
-                                                    fontWeight: "bold",
-                                                    fontSize: "14px",
-                                                }}
-                                            >
-                                                {item.name}
-                                            </div>
-
-                                            <div
-                                                style={{
-                                                    fontFamily:
-                                                        "'Syne', sans-serif",
-                                                }}
-                                            >
-                                                {item.precio.toFixed(2)} €
-                                            </div>
-                                        </div>
-
-                                        <div
-                                            style={{
-                                                display: "flex",
-                                                alignItems: "center",
-                                                background: COLORS.gray,
-                                                borderRadius: "8px",
-                                            }}
-                                        >
-                                            <button
-                                                onClick={() =>
-                                                    updateQty(item.id, -1)
-                                                }
-                                                style={{
-                                                    border: "none",
-                                                    padding: "5px 10px",
-                                                    cursor: "pointer",
-                                                    background: "transparent",
-                                                }}
-                                            >
-                                                -
-                                            </button>
-
-                                            <span
-                                                style={{
-                                                    padding: "0 5px",
-                                                    fontWeight: "bold",
-                                                }}
-                                            >
-                                                {item.qty}
-                                            </span>
-
-                                            <button
-                                                onClick={() =>
-                                                    updateQty(item.id, 1)
-                                                }
-                                                style={{
-                                                    border: "none",
-                                                    padding: "5px 10px",
-                                                    cursor: "pointer",
-                                                    background: "transparent",
-                                                }}
-                                            >
-                                                +
-                                            </button>
-                                        </div>
-                                    </div>
-                                ))
-                            )}
-                        </div>
-
-                        <div
-                            style={{
-                                padding: "24px",
-                                borderTop: "1px solid #EEE",
-                            }}
-                        >
-                            <button
-                                style={{
-                                    width: "100%",
-                                    background: COLORS.dark,
-                                    color: "white",
-                                    padding: "16px",
-                                    borderRadius: "12px",
-                                    border: "none",
-                                    fontWeight: "bold",
-                                    fontSize: "16px",
-                                }}
-                            >
-                                Pagar · {totalPrice.toFixed(2)} €
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-        </div>
+            <FlatList
+                key={numColumns}
+                data={productos}
+                keyExtractor={(item) => item.id.toString()}
+                numColumns={numColumns}
+                columnWrapperStyle={styles.columnWrapper}
+                showsVerticalScrollIndicator={false}
+                renderItem={renderProducto}
+                contentContainerStyle={{ paddingBottom: 50 }}
+            />
+        </View>
     );
 }
+
+const styles = StyleSheet.create({
+    container: { flex: 1, backgroundColor: COLORS.white, paddingHorizontal: 15 },
+    loaderContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+    headerTitle: { fontSize: 32, fontWeight: '900', color: COLORS.dark, marginVertical: 20 },
+    columnWrapper: { justifyContent: 'flex-start', gap: 15 },
+    card: {
+        backgroundColor: COLORS.white,
+        borderRadius: 20,
+        padding: 12,
+        marginBottom: 15,
+        borderWidth: 1,
+        borderColor: COLORS.greenLight,
+    },
+    imageContainer: {
+        aspectRatio: 1,
+        backgroundColor: COLORS.gray,
+        borderRadius: 15,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 10,
+        overflow: 'hidden'
+    },
+    image: { width: '100%', height: '100%' },
+    title: { fontSize: 13, fontWeight: '700', color: COLORS.dark, height: 35 },
+    stockRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginVertical: 5 },
+    stockDot: { width: 6, height: 6, borderRadius: 3 },
+    stockText: { fontSize: 11, fontWeight: '600' },
+    bottomRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 5 },
+    price: { fontSize: 16, fontWeight: '900', color: COLORS.dark },
+    addButton: { backgroundColor: COLORS.dark, padding: 6, borderRadius: 8 },
+    toast: { position: 'absolute', top: 20, alignSelf: 'center', backgroundColor: COLORS.dark, flexDirection: 'row', padding: 12, borderRadius: 50, zIndex: 1000, gap: 8, alignItems: 'center' },
+    toastText: { color: COLORS.white, fontWeight: 'bold' }
+});
