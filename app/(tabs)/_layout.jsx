@@ -1,12 +1,9 @@
 import { Tabs, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-// 1. Importa Image de react-native
 import { Platform, View, ActivityIndicator, useWindowDimensions, Image } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../src/context/ThemeContext';
-
-// 2. Importa tu imagen. Ajusta la ruta si es necesario.
 import FitUpOutline from '../../assets/images/FitUp-outline.png';
 
 export default function TabLayout() {

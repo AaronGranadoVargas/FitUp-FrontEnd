@@ -142,21 +142,23 @@ export default function HomeScreen() {
                 </TouchableOpacity>
 
                 <Text style={styles.sectionTitle}>Historial del Mes</Text>
-                <View style={styles.miniCalendarCard}>
-                    <Calendar
-                        hideArrows={true}
-                        disableMonthChange={true}
-                        onDayPress={() => router.push('/calendario')}
-                        markedDates={marcasCalendario}
-                        theme={{
-                            todayTextColor: theme.colors.naranja,
-                            dotColor: theme.colors.naranja,
-                            selectedDayBackgroundColor: theme.colors.naranja,
-                            monthTextColor: '#333',
-                            textMonthFontWeight: 'bold',
-                        }}
-                    />
-                </View>
+                <TouchableOpacity activeOpacity={0.8} onPress={() => router.push('/calendario')}>
+                    <View style={styles.miniCalendarCard}>
+                        <Calendar
+                            hideArrows={true}
+                            disableMonthChange={true}
+                            onDayPress={() => router.push('/calendario')}
+                            markedDates={marcasCalendario}
+                            theme={{
+                                todayTextColor: theme.colors.naranja,
+                                dotColor: theme.colors.naranja,
+                                selectedDayBackgroundColor: theme.colors.naranja,
+                                monthTextColor: '#333',
+                                textMonthFontWeight: 'bold',
+                            }}
+                        />
+                    </View>
+                </TouchableOpacity>
 
             </View>
         </ScrollView>
