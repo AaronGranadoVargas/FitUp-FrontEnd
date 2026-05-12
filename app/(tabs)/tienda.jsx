@@ -1,7 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { agregarProductoCarrito } from '../../src/api/carritoService'; // <-- Añade esta importación arriba
-import { Alert } from 'react-native'; // <-- Asegúrate de tener Alert importado
-import { View, Text, FlatList, ActivityIndicator, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { View, Text, FlatList, ActivityIndicator, TouchableOpacity, StyleSheet, Image, useWindowDimensions } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { getProductos } from '../../src/api/tiendaService';
@@ -10,15 +8,11 @@ import { theme } from '../../src/styles/theme';
 export default function TiendaScreen() {
     const [productos, setProductos] = useState([]);
     const [cargando, setCargando] = useState(true);
-    const handleAddToCart = async (producto) => {
-        try {
-            await agregarProductoCarrito(producto.id, 1);
-            Alert.alert("🛒 Añadido", `${producto.nombre} se ha añadido a tu carrito.`);
-        } catch (error) {
-            console.error(error);
-            Alert.alert("Error", "No se pudo añadir al carrito.");
-        }
-    };
+    const { width } = useWindowDimensions();
+
+    // Determina el número de columnas y el ancho de la tarjeta según el ancho de la pantalla
+    const numColumns = width < 768 ? 2 : 4;
+    const cardWidth = width < 768 ? '48%' : '23%';
 
     useFocusEffect(
         useCallback(() => {
@@ -34,8 +28,7 @@ export default function TiendaScreen() {
     };
 
     const renderProducto = ({ item }) => (
-        <View style={styles.card}>
-            {/* Si tienes imágenes reales en la BD, usas item.imagenUrl. Si no, un icono genérico */}
+        <View style={[styles.card, { width: cardWidth }]}>
             <View style={styles.imagePlaceholder}>
                 <Ionicons
                     name={item.categoria === 'ROPA' ? 'shirt-outline' : 'nutrition-outline'}
@@ -47,7 +40,7 @@ export default function TiendaScreen() {
                 <Text style={styles.title} numberOfLines={2}>{item.nombre}</Text>
                 <Text style={styles.price}>{item.precio.toFixed(2)} €</Text>
 
-                <TouchableOpacity style={styles.btnAdd} onPress={() => handleAddToCart(item)}>
+                <TouchableOpacity style={styles.btnAdd} onPress={() => alert(`Preparando carrito para: ${item.nombre}`)}>
                     <Ionicons name="cart" size={18} color="white" />
                     <Text style={styles.btnAddText}>Añadir</Text>
                 </TouchableOpacity>
@@ -69,7 +62,8 @@ export default function TiendaScreen() {
             <FlatList
                 data={productos}
                 keyExtractor={(item) => item.id.toString()}
-                numColumns={4}
+                numColumns={numColumns}
+                key={numColumns} // Añadir esta key es importante para que la lista se redibuje al cambiar el número de columnas
                 columnWrapperStyle={styles.row}
                 showsVerticalScrollIndicator={false}
                 renderItem={renderProducto}
@@ -87,7 +81,6 @@ const styles = StyleSheet.create({
     card: {
         backgroundColor: 'white',
         borderRadius: 15,
-        width: '23%', // ← Cambia esto a 23% o 24%
         elevation: 3,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },

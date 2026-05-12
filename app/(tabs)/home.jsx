@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, Platform, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, Platform, TouchableOpacity, ActivityIndicator, StyleSheet } from 'react-native';
 import { useState, useCallback } from 'react';
 import { useRouter, useFocusEffect } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
@@ -12,6 +12,7 @@ export default function HomeScreen() {
     const router = useRouter();
     const [nombreUsuario, setNombreUsuario] = useState('');
     const [cargando, setCargando] = useState(true);
+    const [userRole, setUserRole] = useState(null);
 
     const [entrenamientoHoy, setEntrenamientoHoy] = useState(null);
     const [marcasCalendario, setMarcasCalendario] = useState({});
@@ -37,6 +38,12 @@ export default function HomeScreen() {
                     let nombreGuardado = Platform.OS === 'web'
                         ? localStorage.getItem('userName')
                         : await SecureStore.getItemAsync('userName');
+
+                    // Asumimos que el rol se guarda de la misma forma
+                    let roleGuardado = Platform.OS === 'web'
+                        ? localStorage.getItem('userRole')
+                        : await SecureStore.getItemAsync('userRole');
+
                     if (nombreGuardado) setNombreUsuario(nombreGuardado);
 
                     const lista = await getMisEntrenamientos();
@@ -54,6 +61,8 @@ export default function HomeScreen() {
                     } else {
                         setEntrenamientoHoy(null);
                     }
+
+                    setUserRole(roleGuardado);
 
                 } catch (error) {
                     console.error("Error sincronizando Home:", error);
@@ -77,6 +86,16 @@ export default function HomeScreen() {
     return (
         <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
             <View style={styles.wrapper}>
+
+                {userRole === 'ADMIN' && (
+                    <TouchableOpacity
+                        style={[localStyles.adminButton, { backgroundColor: theme.colors.verdeSalvia }]}
+                        onPress={() => router.push('/addProduct')} // Navega a la pantalla de añadir producto
+                    >
+                        <Ionicons name="add-circle-outline" size={22} color="white" />
+                        <Text style={localStyles.adminButtonText}>Añadir Producto</Text>
+                    </TouchableOpacity>
+                )}
 
                 <View style={styles.header}>
                     <Text style={styles.dateText}>{obtenerTextoFecha()}</Text>
@@ -112,7 +131,7 @@ export default function HomeScreen() {
                     </View>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.shopBanner} activeOpacity={0.8} onPress={() => alert("Ir a la Tienda")}>
+                <TouchableOpacity style={styles.shopBanner} activeOpacity={0.8} onPress={() => router.push('/(tabs)/tienda')}>
                     <View style={styles.shopBannerTextContainer}>
                         <Text style={styles.shopBannerTitle}>Visita la Tienda</Text>
                         <Text style={styles.shopBannerSubtitle}>Suplementación y ropa deportiva.</Text>
@@ -143,3 +162,22 @@ export default function HomeScreen() {
         </ScrollView>
     );
 }
+
+// Estilos locales para el botón de admin
+const localStyles = StyleSheet.create({
+    adminButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 12,
+        borderRadius: 12,
+        marginTop: 60, // Espacio superior para que no se pegue al borde
+        marginBottom: -10, // Compensa el margen del header
+    },
+    adminButtonText: {
+        color: 'white',
+        fontWeight: 'bold',
+        marginLeft: 8,
+        fontSize: 16,
+    },
+});

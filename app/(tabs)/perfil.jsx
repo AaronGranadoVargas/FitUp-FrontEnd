@@ -157,25 +157,6 @@ export default function PerfilScreen() {
                         style={styles.statUnit}>cm</Text></Text>
                 </View>
             </View>
-            <View style={styles.infoCard}>
-                <View style={styles.infoRow}>
-                    <View style={styles.infoBox}>
-                        <Text style={styles.infoLabel}>Teléfono</Text>
-                        <Text style={styles.infoValue}>{perfil?.telefono || '--'}</Text>
-                    </View>
-                    <View style={styles.dividerVertical} />
-                    <View style={styles.infoBox}>
-                        <Text style={styles.infoLabel}>Ciudad</Text>
-                        <Text style={styles.infoValue}>{perfil?.ciudad || '--'}</Text>
-                    </View>
-                </View>
-                <View style={styles.infoRow}>
-                    <View style={styles.infoBox}>
-                        <Text style={styles.infoLabel}>Correo</Text>
-                        <Text style={styles.infoValue}>{perfil?.correo || '--'}</Text>
-                    </View>
-                </View>
-            </View>
 
             <TouchableOpacity style={styles.editButton} onPress={() => setModalVisible(true)}>
                 <Ionicons name="pencil-outline" size={20} color="white"/>

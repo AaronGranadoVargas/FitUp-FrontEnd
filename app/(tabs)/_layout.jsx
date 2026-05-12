@@ -1,13 +1,19 @@
 import { Tabs, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Platform, View, ActivityIndicator } from 'react-native';
+// 1. Importa Image de react-native
+import { Platform, View, ActivityIndicator, useWindowDimensions, Image } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
-import { theme } from '../../src/styles/theme';
 import { Ionicons } from '@expo/vector-icons';
+import { useTheme } from '../../src/context/ThemeContext';
+
+// 2. Importa tu imagen. Ajusta la ruta si es necesario.
+import FitUpOutline from '../../assets/images/FitUp-outline.png';
 
 export default function TabLayout() {
     const router = useRouter();
     const [verificando, setVerificando] = useState(true);
+    const { theme } = useTheme();
+    const { width } = useWindowDimensions();
 
     useEffect(() => {
         const comprobarAcceso = async () => {
@@ -32,6 +38,9 @@ export default function TabLayout() {
         comprobarAcceso();
     }, []);
 
+    const isMobileView = width < 768;
+    const isWebTopBar = Platform.OS === 'web' && !isMobileView;
+
     if (verificando) {
         return (
             <View style={{ flex: 1, justifyContent: 'center', backgroundColor: theme.colors.fondoBase }}>
@@ -45,18 +54,19 @@ export default function TabLayout() {
             headerShown: false,
             tabBarActiveTintColor: theme.colors.naranja,
             tabBarInactiveTintColor: theme.colors.grisTexto,
-            tabBarPosition: Platform.OS === 'web' ? 'top' : 'bottom',
+            tabBarPosition: isWebTopBar ? 'top' : 'bottom',
             tabBarShowLabel: false,
-            tabBarItemStyle: { justifyContent: 'center', alignItems: 'center', paddingTop: 15 },
+            tabBarItemStyle: {
+                justifyContent: 'center',
+                alignItems: 'center',
+                paddingTop: isWebTopBar ? 0 : 10,
+            },
             tabBarStyle: {
                 backgroundColor: theme.colors.blanco,
                 borderTopWidth: 0,
-                elevation: 20,
-                shadowOpacity: 0.3,
-                shadowOffset: { width: 0, height: 8 },
-                shadowRadius: 12,
-                height: 80,
-                paddingBottom: 15,
+                borderTopColor: theme.colors.borde,
+                height: isWebTopBar ? 65 : 90,
+                paddingBottom: isWebTopBar ? 0 : 30,
             }
         }}>
             <Tabs.Screen
@@ -110,14 +120,28 @@ export default function TabLayout() {
                                 width: 40,
                                 height: 40,
                                 borderRadius: 20,
-                                backgroundColor: theme.colors.naranja,  // Fondo naranja sólido
+                                backgroundColor: theme.colors.naranja,
                                 justifyContent: 'center',
                                 alignItems: 'center'
                             }}>
-                                <Ionicons name="home-outline" size={32} color={theme.colors.blanco} />  {/* Icono blanco */}
+                                <Image
+                                    source={FitUpOutline}
+                                    style={{
+                                        width: 40,
+                                        height: 40,
+                                        tintColor: theme.colors.blanco
+                                    }}
+                                />
                             </View>
                         ) : (
-                            <Ionicons name="home-outline" size={28} color={color} />
+                            <Image
+                                source={FitUpOutline}
+                                style={{
+                                    width: 32,
+                                    height: 32,
+                                    tintColor: color
+                                }}
+                            />
                         )
                     )
                 }}
@@ -131,11 +155,11 @@ export default function TabLayout() {
                                 width: 40,
                                 height: 40,
                                 borderRadius: 20,
-                                backgroundColor: theme.colors.naranja,  // Fondo naranja sólido
+                                backgroundColor: theme.colors.naranja,
                                 justifyContent: 'center',
                                 alignItems: 'center'
                             }}>
-                                <Ionicons name="calendar-outline" size={32} color={theme.colors.blanco} />  {/* Icono blanco */}
+                                <Ionicons name="calendar-outline" size={32} color={theme.colors.blanco} />
                             </View>
                         ) : (
                             <Ionicons name="calendar-outline" size={28} color={color} />
@@ -152,11 +176,11 @@ export default function TabLayout() {
                                 width: 40,
                                 height: 40,
                                 borderRadius: 20,
-                                backgroundColor: theme.colors.naranja,  // Fondo naranja sólido
+                                backgroundColor: theme.colors.naranja,
                                 justifyContent: 'center',
                                 alignItems: 'center'
                             }}>
-                                <Ionicons name="person-outline" size={32} color={theme.colors.blanco} />  {/* Icono blanco */}
+                                <Ionicons name="person-outline" size={32} color={theme.colors.blanco} />
                             </View>
                         ) : (
                             <Ionicons name="person-outline" size={28} color={color} />
