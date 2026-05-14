@@ -15,7 +15,7 @@ export default function PerfilScreen() {
 
     const [modalVisible, setModalVisible] = useState(false);
     const [formEdit, setFormEdit] = useState({
-        nombre: '', peso: '', altura: '', telefono: '', ciudad: '', correo: ''
+        nombre: '', peso: '', altura: '', correo: ''
     });
     const [guardando, setGuardando] = useState(false);
 
@@ -36,8 +36,6 @@ export default function PerfilScreen() {
                 nombre: datos.nombre || '',
                 peso: datos.pesoActual ? datos.pesoActual.toString() : '',
                 altura: datos.altura ? datos.altura.toString() : '',
-                telefono: datos.telefono ? datos.telefono.toString() : '',
-                ciudad: datos.ciudad ? datos.ciudad.toString() : '',
                 correo: datos.email || '',
             });
         } catch (error) {
@@ -50,12 +48,12 @@ export default function PerfilScreen() {
     const handleGuardarCambios = async () => {
         try {
             setGuardando(true);
+
+            // CORREGIDO: Mapeamos a 'peso' para que encaje con el request.getPeso() de tu UsuarioService
             const request = {
                 nombre: formEdit.nombre,
-                pesoActual: formEdit.peso ? parseFloat(formEdit.peso) : null,
+                peso: formEdit.peso ? parseFloat(formEdit.peso) : null,
                 altura: formEdit.altura ? parseFloat(formEdit.altura) : null,
-                telefono: formEdit.telefono ? parseFloat(formEdit.telefono) : null,
-                ciudad: formEdit.ciudad ? formEdit.ciudad.toString() : null,
                 correo: formEdit.correo ? formEdit.correo.toString() : null,
             };
 
@@ -63,13 +61,11 @@ export default function PerfilScreen() {
             await cargarDatos();
             setModalVisible(false);
             Alert.alert("¡Éxito!", "Tus datos han sido actualizados.");
-        } catch (error) { Alert.alert("Error", "No se pudo actualizar."); }
-        finally { setGuardando(false); }
-    };
-
-    const handleTelefonoChange = (texto) => {
-        const soloNumeros = texto.replace(/[^0-9]/g, '');
-        setFormEdit({...formEdit, telefono: soloNumeros});
+        } catch (error) {
+            Alert.alert("Error", "No se pudo actualizar.");
+        } finally {
+            setGuardando(false);
+        }
     };
 
     const handleLogout = () => {
