@@ -140,6 +140,7 @@ export default function CalendarioScreen() {
                                     style={styles.notesInput}
                                     multiline
                                     placeholder="Sensaciones del entrenamiento..."
+                                    placeholderTextColor="#A0AAB2"
                                     value={notas}
                                     onChangeText={setNotas}
                                 />
@@ -151,8 +152,12 @@ export default function CalendarioScreen() {
                                     <View key={index} style={styles.exerciseCard}>
                                         <View style={styles.exerciseHeader}>
                                             <TextInput
-                                                style={styles.exerciseNameInput}
+                                                style={[
+                                                    styles.exerciseNameInput,
+                                                    !ejercicio.nombreEjercicio && { fontWeight: 'normal' }
+                                                ]}
                                                 placeholder="Ej: Press de Banca"
+                                                placeholderTextColor="#A0AAB2"
                                                 value={ejercicio.nombreEjercicio}
                                                 onChangeText={(text) => actualizarEjercicio(index, 'nombreEjercicio', text)}
                                             />
@@ -164,9 +169,13 @@ export default function CalendarioScreen() {
                                         <View style={styles.exerciseMetrics}>
                                             <View style={styles.metricInputGroup}>
                                                 <TextInput
-                                                    style={styles.metricInput}
+                                                    style={[
+                                                        styles.metricInput,
+                                                        !ejercicio.series && { fontWeight: 'normal' }
+                                                    ]}
                                                     keyboardType="numeric"
                                                     placeholder="0"
+                                                    placeholderTextColor="#A0AAB2"
                                                     value={ejercicio.series}
                                                     onChangeText={(text) => actualizarEjercicio(index, 'series', text)}
                                                 />
@@ -175,9 +184,13 @@ export default function CalendarioScreen() {
                                             <Text style={{ color: '#CCC', fontWeight: 'bold' }}>X</Text>
                                             <View style={styles.metricInputGroup}>
                                                 <TextInput
-                                                    style={styles.metricInput}
+                                                    style={[
+                                                        styles.metricInput,
+                                                        !ejercicio.repeticiones && { fontWeight: 'normal' }
+                                                    ]}
                                                     keyboardType="numeric"
                                                     placeholder="0"
+                                                    placeholderTextColor="#A0AAB2"
                                                     value={ejercicio.repeticiones}
                                                     onChangeText={(text) => actualizarEjercicio(index, 'repeticiones', text)}
                                                 />
@@ -185,9 +198,13 @@ export default function CalendarioScreen() {
                                             </View>
                                             <View style={styles.metricInputGroup}>
                                                 <TextInput
-                                                    style={styles.metricInput}
+                                                    style={[
+                                                        styles.metricInput,
+                                                        !ejercicio.pesoKg && { fontWeight: 'normal' }
+                                                    ]}
                                                     keyboardType="numeric"
                                                     placeholder="0.0"
+                                                    placeholderTextColor="#A0AAB2"
                                                     value={ejercicio.pesoKg}
                                                     onChangeText={(text) => actualizarEjercicio(index, 'pesoKg', text)}
                                                 />
