@@ -95,7 +95,7 @@ export const perfilStyles = StyleSheet.create({
         marginLeft: 10,
         alignItems: 'center'
     },
-    saveButtonText: {color: 'white', fontWeight: 'bold', fontSize: 16},  // Agrega esta coma
+    saveButtonText: {color: 'white', fontWeight: 'bold', fontSize: 16},
     infoCard: {
         backgroundColor: 'white',
         borderRadius: 15,

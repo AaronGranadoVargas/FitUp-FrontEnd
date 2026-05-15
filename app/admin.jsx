@@ -4,6 +4,7 @@ import { useFocusEffect, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { getProductos, crearProducto, eliminarProducto, actualizarProducto } from '../src/api/tiendaService';
 
+// Las categorías exactas de tu Enum de Java
 const CATEGORIAS = ['SUPLEMENTO', 'ROPA', 'COMIDA'];
 
 export default function AdminScreen() {
@@ -46,31 +47,6 @@ export default function AdminScreen() {
         setForm({ nombre: '', precio: '', stock: '', descripcion: '', categoria: 'SUPLEMENTO', imagenUrl: '' });
         setModalVisible(true);
     };
-
-    // --- FILTROS DE SEGURIDAD PARA LOS INPUTS NUMÉRICOS ---
-
-    const handlePrecioChange = (texto) => {
-        // 1. Cambia las comas por puntos (por si el teclado europeo pone coma)
-        // 2. Elimina cualquier carácter que no sea un número del 0-9 o un punto
-        let limpio = texto.replace(/,/g, '.').replace(/[^0-9.]/g, '');
-
-        // 3. Evita que el usuario escriba más de un punto decimal (ej: 12.5.5)
-        const partes = limpio.split('.');
-        if (partes.length > 2) {
-            limpio = partes[0] + '.' + partes.slice(1).join('');
-        }
-
-        setForm({ ...form, precio: limpio });
-    };
-
-    const handleStockChange = (texto) => {
-        // Elimina cualquier carácter que no sea un número del 0 al 9.
-        // Esto bloquea letras, espacios, puntos, comas y signos negativos (-).
-        const limpio = texto.replace(/[^0-9]/g, '');
-        setForm({ ...form, stock: limpio });
-    };
-
-    // ------------------------------------------------------
 
     const handleGuardar = async () => {
         if (!form.nombre || !form.precio || !form.stock) {
@@ -145,26 +121,10 @@ export default function AdminScreen() {
                             <TextInput style={styles.input} value={form.nombre} onChangeText={t => setForm({...form, nombre: t})} />
 
                             <View style={styles.row}>
-                                <View style={{flex:1, marginRight:10}}>
-                                    <Text style={styles.label}>Precio (€)</Text>
-                                    <TextInput
-                                        style={styles.input}
-                                        keyboardType="decimal-pad"
-                                        value={form.precio}
-                                        onChangeText={handlePrecioChange}
-                                        placeholder="0.00"
-                                    />
-                                </View>
-                                <View style={{flex:1}}>
-                                    <Text style={styles.label}>Stock</Text>
-                                    <TextInput
-                                        style={styles.input}
-                                        keyboardType="number-pad"
-                                        value={form.stock}
-                                        onChangeText={handleStockChange}
-                                        placeholder="0"
-                                    />
-                                </View>
+                                <View style={{flex:1, marginRight:10}}><Text style={styles.label}>Precio (€)</Text>
+                                    <TextInput style={styles.input} keyboardType="numeric" value={form.precio} onChangeText={t => setForm({...form, precio: t})} /></View>
+                                <View style={{flex:1}}><Text style={styles.label}>Stock</Text>
+                                    <TextInput style={styles.input} keyboardType="numeric" value={form.stock} onChangeText={t => setForm({...form, stock: t})} /></View>
                             </View>
 
                             <Text style={styles.label}>URL de la Imagen</Text>
@@ -173,6 +133,7 @@ export default function AdminScreen() {
                             <Text style={styles.label}>Descripción</Text>
                             <TextInput style={[styles.input, { height: 80 }]} multiline numberOfLines={3} value={form.descripcion} onChangeText={t => setForm({...form, descripcion: t})} />
 
+                            {/* SELECTOR DE CATEGORÍA (ENUM) */}
                             <Text style={styles.label}>Categoría</Text>
                             <View style={styles.categoryRow}>
                                 {CATEGORIAS.map((cat) => (

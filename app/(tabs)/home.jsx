@@ -39,7 +39,6 @@ export default function HomeScreen() {
                         ? localStorage.getItem('userName')
                         : await SecureStore.getItemAsync('userName');
 
-                    // Asumimos que el rol se guarda de la misma forma
                     let roleGuardado = Platform.OS === 'web'
                         ? localStorage.getItem('userRole')
                         : await SecureStore.getItemAsync('userRole');
@@ -90,7 +89,7 @@ export default function HomeScreen() {
                 {userRole === 'ADMIN' && (
                     <TouchableOpacity
                         style={[localStyles.adminButton, { backgroundColor: theme.colors.verdeSalvia }]}
-                        onPress={() => router.push('/addProduct')} // Navega a la pantalla de añadir producto
+                        onPress={() => router.push('/addProduct')}
                     >
                         <Ionicons name="add-circle-outline" size={22} color="white" />
                         <Text style={localStyles.adminButtonText}>Añadir Producto</Text>
@@ -165,7 +164,6 @@ export default function HomeScreen() {
     );
 }
 
-// Estilos locales para el botón de admin
 const localStyles = StyleSheet.create({
     adminButton: {
         flexDirection: 'row',
@@ -173,8 +171,8 @@ const localStyles = StyleSheet.create({
         justifyContent: 'center',
         padding: 12,
         borderRadius: 12,
-        marginTop: 60, // Espacio superior para que no se pegue al borde
-        marginBottom: -10, // Compensa el margen del header
+        marginTop: 60,
+        marginBottom: -10,
     },
     adminButtonText: {
         color: 'white',

@@ -48,8 +48,6 @@ export default function PerfilScreen() {
     const handleGuardarCambios = async () => {
         try {
             setGuardando(true);
-
-            // CORREGIDO: Mapeamos a 'peso' para que encaje con el request.getPeso() de tu UsuarioService
             const request = {
                 nombre: formEdit.nombre,
                 peso: formEdit.peso ? parseFloat(formEdit.peso) : null,
@@ -120,7 +118,6 @@ export default function PerfilScreen() {
                 <Text style={styles.editButtonText}>Editar Perfil</Text>
             </TouchableOpacity>
 
-            {/* BOTÓN ADMIN: SOLO SE MUESTRA SI ERES ADMIN */}
             {(perfil?.rol === 'ADMIN' || perfil?.rol === 'ROLE_ADMIN') && (
                 <TouchableOpacity
                     style={[styles.editButton, { backgroundColor: '#1E1E1E', marginTop: 15 }]}

@@ -24,11 +24,15 @@ export default function LoginScreen() {
         try {
             await loginUsuario(email.trim().toLowerCase(), password);
             router.replace('/(tabs)/home');
-        } catch (errores) {
-            if (typeof errores === 'object' && errores !== null) {
-                setMensajeError(errores.mensaje ? `❌ ${errores.mensaje}` : `❌ ${Object.values(errores).join('\n')}`);
+        } catch (error) {
+            console.error("Error en el login:", error);
+            if (error.isAxiosError && !error.response) {
+                setMensajeError("❌ Error de red. Revisa la conexión y la IP del servidor.");
+            }
+            else if (error.response && error.response.data && (error.response.data.mensaje || error.response.data.message)) {
+                setMensajeError(`❌ ${error.response.data.mensaje || error.response.data.message}`);
             } else {
-                setMensajeError("❌ No se pudo conectar con el servidor.");
+                setMensajeError("❌ Credenciales incorrectas o error inesperado.");
             }
         } finally {
             setCargando(false);

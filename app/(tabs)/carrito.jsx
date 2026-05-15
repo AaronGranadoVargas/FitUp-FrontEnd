@@ -63,7 +63,6 @@ export default function CarritoScreen() {
         return (
             <View style={styles.cartItem}>
                 <View style={styles.imageContainer}>
-                    {/* Asumimos que el item tiene imagenUrl, si no, mostramos un icono */}
                     {item.imagenUrl ? (
                         <Image source={{ uri: item.imagenUrl }} style={styles.image} resizeMode="cover" />
                     ) : (
@@ -148,7 +147,7 @@ const styles = StyleSheet.create({
     qtyBtn: {
         width: 34,
         height: 34,
-        borderRadius: 17, // Hace el botón circular
+        borderRadius: 17,
         backgroundColor: COLORS.white,
         alignItems: 'center',
         justifyContent: 'center',

@@ -2,18 +2,12 @@ import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 
-// URL base de tu backend (desde tus variables de entorno)
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
-// Función auxiliar para obtener el token dependiendo de si es Web o Móvil
 const obtenerToken = async () => {
     if (Platform.OS === 'web') return localStorage.getItem('userToken');
     return await SecureStore.getItemAsync('userToken');
 };
-
-// ----------------------------------------------------
-// OPERACIONES PÚBLICAS (Para todos los usuarios)
-// ----------------------------------------------------
 
 export const getProductos = async () => {
     try {
@@ -27,10 +21,6 @@ export const getProductos = async () => {
         return [];
     }
 };
-
-// ----------------------------------------------------
-// OPERACIONES DE ADMINISTRADOR (Requieren Rol ADMIN)
-// ----------------------------------------------------
 
 export const crearProducto = async (productoRequest) => {
     try {

@@ -35,5 +35,4 @@ export const darkTheme = {
     }
 };
 
-// Mantener exportación por defecto para compatibilidad si es necesario
 export const theme = lightTheme;
